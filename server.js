@@ -12,7 +12,7 @@ const MODELS = {
   'gpt-4': 'meta/llama-2-70b-chat',
   'gpt-3.5-turbo': 'mistralai/mistral-7b-instruct-v0.2',
   'claude': 'nvidia/nemotron-4-340b-instruct',
-  'llama': 'meta/llama-2-70b-chat',
+  'llama': 'moonshotai/kimi-k3',
   'mistral': 'mistralai/mistral-nemo-12b-instruct',
 };
 
