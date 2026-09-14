@@ -9,7 +9,7 @@ const NVIDIA_BASE = 'https://integrate.api.nvidia.com/v1';
 // Maps friendly/common model names (as sent by Janitor AI) to actual
 // Nvidia NIM model identifiers. Extend this as needed.
 const MODELS = {
-  'gpt-4': 'meta/llama-2-70b-chat',
+  'gpt-4': 'moonshotai/kimi-k3',
   'gpt-3.5-turbo': 'mistralai/mistral-7b-instruct-v0.2',
   'claude': 'nvidia/nemotron-4-340b-instruct',
   'llama': 'moonshotai/kimi-k3',
