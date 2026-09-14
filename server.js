@@ -6,9 +6,25 @@ app.use(express.json({ limit: '10mb' }));
 
 const NVIDIA_BASE = 'https://integrate.api.nvidia.com/v1';
 
+// Maps friendly/common model names (as sent by Janitor AI) to actual
+// Nvidia NIM model identifiers. Extend this as needed.
+const MODELS = {
+  'gpt-4': 'meta/llama-2-70b-chat',
+  'gpt-3.5-turbo': 'mistralai/mistral-7b-instruct-v0.2',
+  'claude': 'nvidia/nemotron-4-340b-instruct',
+  'llama': 'meta/llama-2-70b-chat',
+  'mistral': 'mistralai/mistral-nemo-12b-instruct',
+};
+
+const DEFAULT_MODEL = 'meta/llama-2-70b-chat';
+
 // JanitorAI will hit this as your "custom OpenAI-compatible" endpoint
 app.post('/v1/chat/completions', async (req, res) => {
   try {
+    // Map the requested model name to the actual Nvidia model identifier.
+    const nvidiaModel = MODELS[req.body.model] || req.body.model || DEFAULT_MODEL;
+    req.body.model = nvidiaModel;
+
     const nvidiaRes = await fetch(`${NVIDIA_BASE}/chat/completions`, {
       method: 'POST',
       headers: {
@@ -38,12 +54,16 @@ app.post('/v1/chat/completions', async (req, res) => {
   }
 });
 
-// Optional: expose model list
-app.get('/v1/models', async (req, res) => {
-  const r = await fetch(`${NVIDIA_BASE}/models`, {
-    headers: { 'Authorization': `Bearer ${process.env.NVIDIA_API_KEY}` },
-  });
-  res.status(r.status).json(await r.json());
+// Expose the friendly model map so Janitor AI can see available options,
+// in an OpenAI-compatible /v1/models shape.
+app.get('/v1/models', (req, res) => {
+  const data = Object.keys(MODELS).map((id) => ({
+    id,
+    object: 'model',
+    owned_by: 'nvidia-proxy',
+    nvidia_model: MODELS[id],
+  }));
+  res.json({ object: 'list', data });
 });
 
 const PORT = process.env.PORT || 3000;
